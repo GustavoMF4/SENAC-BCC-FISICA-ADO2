@@ -13,6 +13,7 @@
 //nota:
 //esse desnho acima não tem interção ou sentido algum coma a atividade, é apenas um desenho para enfeitar o código :D
 
+
 const G = 9.81;
 const TEMPO_MAX = 10;
 
@@ -46,7 +47,7 @@ function setup() {
   createCanvas(1000, 650);
   textFont("Arial");
 
-   // Sliders do plano inclinado
+  // Sliders do plano inclinado
   controles.m1 = criarSlider(1, 0.1, 10, 0.1, 720, 200);
   controles.m2 = criarSlider(1, 0.1, 10, 0.1, 720, 260);
   controles.theta = criarSlider(30, 0, 80, 1, 720, 320);
@@ -143,7 +144,7 @@ function draw() {
 
   calcularSistema();
 
-  // Relógio da animação.
+  // Relógio da animação
   const agora = millis();
   const dt = min((agora - ultimoTempo) / 1000, 0.05);
   ultimoTempo = agora;
@@ -169,7 +170,6 @@ function desenharCabecalho() {
   fill(cores.secundario);
   text("Modelos físicos interativos", 27, 47);
 
-  // Destaque do sistema selecionado.
   fill(cores.azul);
   textSize(14);
   text(sistema, 28, 79);
@@ -199,16 +199,16 @@ function calcularPlanoInclinado() {
 
   const theta = radians(thetaGraus);
 
-  // Componente do peso paralela ao plano.
+  // Componente do peso paralela ao plano
   const pesoParalelo = m1 * G * sin(theta);
 
-  // Força normal.
+  // Força normal
   const normal = m1 * G * cos(theta);
 
-  // Modelo simplificado de atrito.
+  // Modelo simplificado de atrito
   const atrito = mu * normal;
 
-  // Força motriz, considerando m2 descendo.
+  // Força motriz, considerando m2 descendo
   const forcaMotriz = m2 * G - pesoParalelo;
 
   let aceleracao;
@@ -232,12 +232,20 @@ function calcularPlanoInclinado() {
       : "m1 desce / m2 sobe";
   }
 
+  // Velocidade final após TEMPO_MAX segundos.
+  // O modelo considera velocidade inicial igual a zero.
+  const velocidadeFinal = aceleracao * TEMPO_MAX;
+
   const pontos = [];
 
   for (let i = 0; i <= 200; i++) {
     const t = TEMPO_MAX * i / 200;
     const posicao = 0.5 * aceleracao * t * t;
-    pontos.push({ x: t, y: posicao });
+
+    pontos.push({
+      x: t,
+      y: posicao
+    });
   }
 
   dadosGrafico.push({
@@ -259,7 +267,8 @@ function calcularPlanoInclinado() {
       `Tração: ${tracao.toFixed(3)} N`,
       "",
       `Status: ${status}`,
-      `Velocidade em 10 s: ${(aceleracao * TEMPO_MAX).toFixed(2)} m/s`
+      `Velocidade em 10 s: ${velocidadeFinal.toFixed(2)} m/s`,
+      `Velocidade final: ${velocidadeFinal.toFixed(2)} m/s`
     ]
   };
 }
@@ -299,7 +308,6 @@ function calcularCentripeta() {
 // --------------------------------------------------
 // SISTEMA 3: FORÇA DE ARRASTO
 // --------------------------------------------------
-
 
 function calcularArrasto() {
   const m = controles.ma.value();
@@ -374,12 +382,7 @@ function calcularArrasto() {
       `Posição em 10 s: ${posicao(TEMPO_MAX).toFixed(3)} m`
     ]
   };
-
-  console.log("Modelo:", tipoArrasto);
-  console.log("Pontos de velocidade:", pontosVelocidade.length);
-  console.log("Pontos de posição:", pontosPosicao.length);
 }
-
 
 // --------------------------------------------------
 // DESENHO DOS GRÁFICOS
@@ -411,13 +414,15 @@ function desenharGrafico() {
   let minimoY = min(0, ...todosY);
   let maximoY = max(1, ...todosY);
 
-  if (maximoY === minimoY) maximoY = minimoY + 1;
+  if (maximoY === minimoY) {
+    maximoY = minimoY + 1;
+  }
 
   const margem = (maximoY - minimoY) * 0.08;
   minimoY -= margem;
   maximoY += margem;
 
-  // Grade horizontal e vertical.
+  // Grade horizontal e vertical
   stroke(cores.grade);
   strokeWeight(1);
 
@@ -449,7 +454,7 @@ function desenharGrafico() {
     stroke(cores.grade);
   }
 
-  // Título e eixos.
+  // Título e eixos
   noStroke();
   fill(cores.texto);
   textAlign(CENTER, TOP);
@@ -471,7 +476,7 @@ function desenharGrafico() {
   text("Valor físico", 0, 0);
   pop();
 
-  // Curvas.
+  // Curvas
   for (const serie of dadosGrafico) {
     noFill();
     stroke(serie.cor);
@@ -487,7 +492,7 @@ function desenharGrafico() {
     endShape();
   }
 
-  // Legenda.
+  // Legenda
   let legendaX = x0;
 
   for (const serie of dadosGrafico) {
@@ -510,7 +515,6 @@ function desenharGrafico() {
 // --------------------------------------------------
 
 function desenharOrbita(x0, y0, largura, altura) {
-  const m = controles.m.value();
   const R = controles.R.value();
   const v = controles.v.value();
   const omega = v / R;
@@ -527,7 +531,7 @@ function desenharOrbita(x0, y0, largura, altura) {
   textSize(15);
   text("Movimento Circular Uniforme", cx, 122);
 
-  // Órbita.
+  // Órbita
   noFill();
   stroke(cores.cinza);
   strokeWeight(2);
@@ -535,12 +539,12 @@ function desenharOrbita(x0, y0, largura, altura) {
   ellipse(cx, cy, raioDesenho * 2, raioDesenho * 2);
   drawingContext.setLineDash([]);
 
-  // Centro.
+  // Centro
   stroke(cores.texto);
   line(cx - 7, cy, cx + 7, cy);
   line(cx, cy - 7, cx, cy + 7);
 
-  // Posição da massa.
+  // Posição da massa
   const px = cx + raioDesenho * cos(angulo);
   const py = cy - raioDesenho * sin(angulo);
 
@@ -569,27 +573,34 @@ function desenharOrbita(x0, y0, largura, altura) {
 function desenharPainelResultados() {
   noStroke();
   fill(cores.painel);
-  rect(695, 470, 290, 132, 12);
+
+
+  rect(695, 465, 290, 180, 12);
 
   fill(cores.texto);
   textAlign(LEFT, TOP);
   textSize(14);
-  text("Resultados", 710, 482);
+  text("Resultados", 710, 474);
 
   fill(cores.secundario);
-  textSize(11);
+  textSize(10.5);
 
   const linhas = resultados.linhas || [];
-  let y = 504;
+  let y = 495;
+  const espacamento = 11.8;
 
-  // Mostra as principais informações no painel.
-  // O painel pode ser rolado visualmente reduzindo a quantidade
-  // de linhas, por isso exibimos aqui as primeiras informações.
-  for (let i = 0; i < min(linhas.length, 6); i++) {
-    text(linhas[i], 710, y);
-    y += 15;
+  // Exibe todas as linhas, incluindo os resultados finais.
+  for (let i = 0; i < linhas.length; i++) {
+    if (linhas[i] !== "") {
+      text(linhas[i], 710, y);
+    }
+    y += espacamento;
   }
 }
+
+// --------------------------------------------------
+// PAINEL DE CONTROLES
+// --------------------------------------------------
 
 function desenharPainelControles() {
   noStroke();
